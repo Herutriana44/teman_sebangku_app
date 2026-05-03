@@ -127,7 +127,7 @@ class _CameraScreenState extends State<CameraScreen> {
       );
 
       if (!mounted) return;
-      if (nav.canPop) nav.pop();
+      if (nav.canPop()) nav.pop();
 
       await Navigator.of(context).push<void>(
         MaterialPageRoute(
@@ -139,7 +139,7 @@ class _CameraScreenState extends State<CameraScreen> {
         ),
       );
     } on GeminiSolveException catch (e) {
-      if (mounted && Navigator.of(context).canPop) {
+      if (mounted && Navigator.of(context).canPop()) {
         Navigator.of(context).pop();
       }
       if (mounted) {
@@ -148,7 +148,7 @@ class _CameraScreenState extends State<CameraScreen> {
         );
       }
     } catch (e) {
-      if (mounted && Navigator.of(context).canPop) {
+      if (mounted && Navigator.of(context).canPop()) {
         Navigator.of(context).pop();
       }
       if (mounted) {
