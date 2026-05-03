@@ -79,7 +79,7 @@ class _SplashScreenState extends State<SplashScreen> {
                   'Jawab soal dari foto dengan Gemini',
                   textAlign: TextAlign.center,
                   style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                        color: scheme.onPrimaryContainer.withValues(alpha: 0.85),
+                        color: scheme.onPrimaryContainer.withOpacity(0.85),
                       ),
                 ),
                 const SizedBox(height: 48),
