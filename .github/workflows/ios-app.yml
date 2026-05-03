@@ -1,0 +1,55 @@
+name: Build iOS app
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+  workflow_dispatch:
+
+concurrency:
+  group: ios-app-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Dependencies
+        run: flutter pub get
+
+      # Tanpa sertifikat/provisioning di repo — menghasilkan Runner.app untuk CI.
+      # Untuk IPA/TestFlight, tambahkan langkah signing (fastlane/codemagic) + secrets.
+      - name: Build iOS (release, no codesign)
+        run: flutter build ios --release --no-codesign
+
+      - name: Zip Runner.app
+        run: |
+          set -e
+          for CAND in \
+            "build/ios/iphoneos/Runner.app" \
+            "build/ios/Release-iphoneos/Runner.app"; do
+            if [ -d "$CAND" ]; then
+              (cd "$(dirname "$CAND")" && zip -ry "$GITHUB_WORKSPACE/Runner.app.zip" "$(basename "$CAND")")
+              exit 0
+            fi
+          done
+          echo "Runner.app tidak ditemukan."
+          ls -la build/ios/ 2>/dev/null || true
+          exit 1
+
+      - name: Upload iOS app bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-runner-app
+          path: Runner.app.zip
+          if-no-files-found: error
